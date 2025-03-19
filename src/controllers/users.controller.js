@@ -8,7 +8,7 @@ export const getUsers = async (req, res) => {
     const result = await pool
       .request()
       .query(
-        'SELECT id_usuario, username, email, password, created_at, updated_at FROM tb_usuarios; SELECT SCOPE_IDENTITY() AS id'
+        'SELECT id, nombre, contraseña, created_at, updated_at FROM tb_usuarios; SELECT SCOPE_IDENTITY() AS id'
       );
 
     if (result.rowsAffected[0] === 0)
@@ -25,8 +25,8 @@ export const getUser = async (req, res) => {
   try {
     const result = await pool
       .request()
-      .input('id_usuario', sql.Int, req.params.id_usuario)
-      .query('SELECT * FROM tb_usuarios WHERE id_usuario = @id_usuario');
+      .input('id', sql.Int, req.params.id)
+      .query('SELECT * FROM tb_usuarios WHERE id = @id');
 
     if (result.rowsAffected[0] === 0)
       return res.status(404).json({ message: 'User not found' });
@@ -40,6 +40,7 @@ export const getUser = async (req, res) => {
 export const postUsers = async (req, res) => {
   const pool = await getConnection();
   try {
+    /*
     const email = await pool
       .request()
       .input('email', sql.VarChar, req.body.email)
@@ -48,23 +49,22 @@ export const postUsers = async (req, res) => {
     if (email.recordset.length > 0) {
       return res.status(404).json({ message: 'Correo ya registrado' });
     }
-
+  */
     const result = await pool
       .request()
-      .input('username', sql.VarChar, req.body.username)
-      .input('email', sql.VarChar, req.body.email)
-      .input('password', sql.VarChar, req.body.password)
+      .input('nombre', sql.VarChar, req.body.nombre)
+      .input('contraseña', sql.VarChar, req.body.contraseña)
       .query(
-        'INSERT INTO tb_usuarios (username, email, password) VALUES (@username, @email, dbo.protect(@password)); SELECT SCOPE_IDENTITY() AS id'
+        'INSERT INTO tb_usuarios (nombre, contraseña) VALUES (@nombre, dbo.protect(@contraseña)); SELECT SCOPE_IDENTITY() AS id'
       );
 
     const newUserId = result.recordset[0].id;
 
     const userResult = await pool
       .request()
-      .input('id_usuario', sql.Int, newUserId)
+      .input('id', sql.Int, newUserId)
       .query(
-        'SELECT  id_usuario, username, email, password, created_at, updated_at FROM tb_usuarios WHERE id_usuario = @id_usuario'
+        'SELECT  id, nombre, contraseña, created_at, updated_at FROM tb_usuarios WHERE id = @id'
       );
 
     const token = await createAccessToken({ id: userResult.id_usuario });
@@ -76,7 +76,7 @@ export const postUsers = async (req, res) => {
     console.error(error);
   }
 };
-
+/*
 export const putUsers = async (req, res) => {
   const pool = await getConnection();
   try {
@@ -130,17 +130,17 @@ export const deleteUsers = async (req, res) => {
     console.error(error);
   }
 };
-
+*/
 export const loginUsers = async (req, res) => {
-  const { email, password } = req.body;
+  const { nombre, contraseña } = req.body;
   const pool = await getConnection();
 
   try {
     const result = await pool
       .request()
-      .input('email', sql.VarChar, email)
+      .input('nombre', sql.VarChar, nombre)
       .query(
-        'SELECT id_usuario, username, email, dbo.desprotect(CONVERT(VARBINARY(8000), password)) AS decryptPassword, created_at, updated_at FROM tb_usuarios WHERE email = @email'
+        'SELECT id, nombre, dbo.desprotect(CONVERT(VARBINARY(8000), contraseña)) AS decryptPassword, created_at, updated_at FROM tb_usuarios WHERE nombre = @nombre'
       );
 
     if (result.recordset.length === 0) {
@@ -149,8 +149,8 @@ export const loginUsers = async (req, res) => {
 
     const userFound = result.recordset[0];
 
-    if (password !== userFound.decryptPassword) {
-      return res.status(400).json({ message: 'Incorrect Password' });
+    if (contraseña !== userFound.decryptPassword) {
+      return res.status(400).json({ message: 'Incorrect user' });
     }
 
     const token = await createAccessToken({ id: userFound.id_usuario });
@@ -158,9 +158,8 @@ export const loginUsers = async (req, res) => {
     res.cookie('token', token);
 
     return res.json({
-      id_usuario: userFound.id_usuario,
-      username: userFound.username,
-      email: userFound.email,
+      id: userFound.id,
+      nombre: userFound.nombre,
       created_at: userFound.created_at,
       updated_at: userFound.updated_at,
     });
@@ -169,7 +168,7 @@ export const loginUsers = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
-
+/*
 export const profile = async (req, res) => {
   const pool = await getConnection();
   try {
@@ -177,9 +176,9 @@ export const profile = async (req, res) => {
 
     const result = await pool
       .request()
-      .input('id_usuario', sql.Int, req.user.id)
+      .input('id', sql.Int, req.user.id)
       .query(
-        'SELECT id_usuario, username, email, dbo.desprotect(password) AS password, created_at, updated_at FROM tb_usuarios WHERE id_usuario = @id_usuario'
+        'SELECT id, nombre, dbo.desprotect(contraseña) AS contraseña, created_at, updated_at FROM tb_usuarios WHERE id = @id'
       );
 
     if (result.recordset.length === 0) {
@@ -189,10 +188,9 @@ export const profile = async (req, res) => {
     const userFound = result.recordset[0];
 
     return res.json({
-      id_usuario: userFound.id_usuario,
-      username: userFound.username,
-      email: userFound.email,
-      password: userFound.password,
+      id: userFound.id,
+      nombre: userFound.username,
+      contraseña: userFound.password,
       created_at: userFound.created_at,
       updated_at: userFound.updated_at,
     });
@@ -201,7 +199,7 @@ export const profile = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
+*/
 export const logout = async (req, res) => {
   try {
     res.cookie('token', '', {
