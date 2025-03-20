@@ -69,7 +69,7 @@ export const postUsers = async (req, res) => {
         'SELECT  id, nombre, contraseña, created_at, updated_at FROM tb_usuarios WHERE id = @id'
       );
 
-    const token = await createAccessToken({ id: userResult.id_usuario });
+    const token = await createAccessToken({ id: userResult.recordset[0].id });
     console.log('Token generado:', token);
     res.cookie('token', token);
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
 import '../styles/Login_Page.css';
 
@@ -73,16 +73,19 @@ function HomePage() {
             >
               Iniciar sesión
             </button>
+
+            {/* Link de "registrarse" */}
+            <p className='register-link'>
+              ¿No tienes cuenta?{' '}
+              <Link
+                to='/register'
+                className='register-btn'
+              >
+                Regístrate aquí
+              </Link>
+            </p>
           </form>
-          <p className='signup-link'>
-            ¿No tienes cuenta?{' '}
-            <Link
-              to='/register'
-              className='signup-link-text'
-            >
-              Regístrate
-            </Link>
-          </p>
+          {/*  */}
         </div>
       </div>
     </div>
