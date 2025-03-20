@@ -1,6 +1,8 @@
 import { getConnection } from '../connection/conection.js';
 import sql from 'mssql';
 import { createAccessToken } from '../jwt/jwt.js';
+import jwt from 'jsonwebtoken';
+import { TOKEN_SECRET } from '../jwt/KEY.js';
 
 export const getUsers = async (req, res) => {
   try {
@@ -131,6 +133,7 @@ export const deleteUsers = async (req, res) => {
   }
 };
 */
+
 export const loginUsers = async (req, res) => {
   const { nombre, contraseña } = req.body;
   const pool = await getConnection();
@@ -153,8 +156,9 @@ export const loginUsers = async (req, res) => {
       return res.status(400).json({ message: 'Incorrect user' });
     }
 
-    const token = await createAccessToken({ id: userFound.id_usuario });
-    console.log('Token generado:', token);
+    const token = await createAccessToken({ id: userFound.id });
+    console.log('Token generado:', token); // Revisa si el token contiene el 'id' esperado
+
     res.cookie('token', token);
 
     return res.json({
@@ -168,6 +172,7 @@ export const loginUsers = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
 /*
 export const profile = async (req, res) => {
   const pool = await getConnection();
@@ -210,3 +215,83 @@ export const logout = async (req, res) => {
     console.error(error);
   }
 };
+
+export const verifyToken = async (req, res) => {
+  const { token } = req.cookies;
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, TOKEN_SECRET);
+
+    console.log('Decoded token:', decoded);
+
+    const pool = await getConnection();
+
+    // Consultamos en la base de datos si el usuario existe
+    const result = await pool
+      .request()
+      .input('id', sql.Int, decoded.id) // Aquí usamos 'decoded.id' para consultar en la base de datos
+      .query(
+        'SELECT id, nombre, created_at, updated_at FROM tb_usuarios WHERE id = @id'
+      );
+
+    // Si no encontramos el usuario, respondemos con un error
+    if (result.recordset.length === 0) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const userFound = result.recordset[0]; // El primer usuario encontrado en la base de datos
+
+    // Respondemos con los datos del usuario
+    return res.json({
+      id: userFound.id, // Aquí usamos 'id' ya que es el campo en la base de datos
+      nombre: userFound.nombre,
+      created_at: userFound.created_at,
+      updated_at: userFound.updated_at,
+    });
+  } catch (error) {
+    console.error('Error en verifyToken:', error);
+    return res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+/*
+export const verifyToken = async (req, res) => {
+  try {
+    const pool = await getConnection();
+
+    const { token } = req.cookies; // Recuperamos el token desde las cookies
+
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const decoded = jwt.verify(token, TOKEN_SECRET);
+    const result = await pool
+      .request()
+      .input('id', sql.Int, decoded.id) // 'decoded.id' debe ser el ID del usuario dentro del token
+      .query(
+        'SELECT id, nombre, created_at, updated_at FROM tb_usuarios WHERE id = @id'
+      );
+
+    // Si no encontramos el usuario, respondemos con un error
+    if (result.recordset.length === 0) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const userFound = result.recordset[0];
+
+    // Si el usuario existe, respondemos con sus datos
+    return res.json({
+      id: userFound.id_usuario,
+      nombre: userFound.nombre,
+      created_at: userFound.created_at,
+      updated_at: userFound.updated_at,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server Error' });
+  }
+};
+*/

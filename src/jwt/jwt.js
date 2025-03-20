@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from './KEY.js';
 
 export function createAccessToken(payload) {
+  console.log('Payload en createAccessToken:', payload);
   return new Promise((resolve, reject) => {
     jwt.sign(
       payload,
