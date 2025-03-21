@@ -1,17 +1,33 @@
 import { useAuth } from '../context/AuthProvider';
 import { Navigate, Outlet } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import '../styles/Loading.css';
 
 function Protected_Route_Page() {
-  const { loading, isAuthenticated } = useAuth();
-  if (loading) return <h1>Loading...</h1>;
+  const { isAuthenticated } = useAuth();
+  const [delayedLoading, setDelayedLoading] = useState(true);
 
-  if (!loading && !isAuthenticated)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDelayedLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (delayedLoading) {
+    return <h1>Loading...</h1>;
+  }
+
+  if (!isAuthenticated) {
     return (
       <Navigate
         to='/'
         replace
       />
     );
+  }
+
   return <Outlet />;
 }
 
