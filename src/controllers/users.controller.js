@@ -22,6 +22,24 @@ export const getUsers = async (req, res) => {
   }
 };
 
+export const getUsersdesencript = async (req, res) => {
+  try {
+    const pool = await getConnection();
+    const result = await pool
+      .request()
+      .query(
+        'SELECT id, nombre, dbo.desprotect(CONVERT(VARBINARY(8000), contraseña)) AS decryptPassword, created_at, updated_at FROM tb_usuarios'
+      );
+
+    if (result.rowsAffected[0] === 0)
+      return res.status(404).json({ message: 'User not found' });
+
+    res.json(result.recordset);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const getUser = async (req, res) => {
   const pool = await getConnection();
   try {
@@ -153,7 +171,7 @@ export const loginUsers = async (req, res) => {
     const userFound = result.recordset[0];
 
     if (contraseña !== userFound.decryptPassword) {
-      return res.status(400).json({ message: 'Incorrect user' });
+      return res.status(400).json({ message: 'Incorrect password' });
     }
 
     const token = await createAccessToken({ id: userFound.id });

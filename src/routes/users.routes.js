@@ -6,6 +6,7 @@ import {
   postUsers,
   loginUsers,
   verifyToken,
+  getUsersdesencript,
 } from '../controllers/users.controller.js';
 /*
 import { authRequierd } from '../middleware/profile.middleware.js';
@@ -13,6 +14,9 @@ import { authRequierd } from '../middleware/profile.middleware.js';
 const router = Router();
 
 router.get('/user', getUsers);
+
+router.get('/desencript', getUsersdesencript);
+
 router.get('/user/:id', getUser);
 router.post('/register', postUsers);
 /*

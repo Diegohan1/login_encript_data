@@ -1,0 +1,97 @@
+/* Estilos generales */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f7fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+/* Estilo específico para el botón de logout */
+.logout-button {
+  background-color: #ff4b5c; /* Rojo vibrante */
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-bottom: 30px; /* Espacio debajo del botón */
+  display: block;
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Efecto de hover sobre el botón */
+.logout-button:hover {
+  background-color: #ff2e41; /* Rojo más oscuro */
+  transform: scale(1.05); /* Efecto de agrandamiento */
+}
+
+/* Efecto de foco */
+.logout-button:focus {
+  outline: none;
+  box-shadow: 0 0 5px 2px rgba(255, 75, 92, 0.5); /* Resalta el botón con sombra */
+}
+
+/* Estilo del contenedor principal */
+h1 {
+  text-align: center;
+  color: #3a3a3a;
+  margin-top: 50px;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+/* Tabla de usuarios */
+table {
+  width: 80%;
+  margin: 30px auto;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Encabezados de la tabla */
+th {
+  padding: 12px 20px;
+  background-color: #4caf50;
+  color: white;
+  text-align: left;
+  font-size: 1.1rem;
+}
+
+/* Celdas de la tabla */
+td {
+  padding: 12px 20px;
+  border-bottom: 1px solid #ddd;
+  font-size: 1rem;
+  text-align: left;
+}
+
+/* Estilo de fila al pasar el mouse por encima */
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Estilo de la fila de "No hay usuarios disponibles" */
+tr td[colspan='5'] {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+}
+
+/* Responsive: cuando la pantalla es pequeña */
+@media (max-width: 768px) {
+  table {
+    width: 90%;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}

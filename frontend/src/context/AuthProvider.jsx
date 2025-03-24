@@ -1,5 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { loginRequest, registerRequest, verifyTokenRequest } from '../api/auth';
+import {
+  desencriptUsuarios,
+  loginRequest,
+  registerRequest,
+  usuariosRequest,
+  verifyTokenRequest,
+} from '../api/auth';
 import Cookies from 'js-cookie';
 import PropTypes from 'prop-types';
 
@@ -18,6 +24,8 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [desencript, setDesencript] = useState([]);
 
   const signup = async user => {
     try {
@@ -65,6 +73,26 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const usuarios = async () => {
+    try {
+      const users = await usuariosRequest();
+      setUsers(users.data);
+      console.log(users);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const desencriptarUsuarios = async () => {
+    try {
+      const response = await desencriptUsuarios(); // Llama a la API para obtener los usuarios desencriptados
+      setDesencript(response.data); // Guarda los datos desencriptados en el estado
+      console.log(response.data); // Muestra los datos desencriptados en la consola (opcional)
+    } catch (error) {
+      console.error('Error al obtener usuarios desencriptados:', error);
+    }
+  };
+
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -110,10 +138,14 @@ export const AuthProvider = ({ children }) => {
         logout,
         signup,
         signin,
+        usuarios,
+        desencriptarUsuarios,
         user,
+        users,
         loading,
         isAuthenticated,
         errors,
+        desencript,
       }}
     >
       {children}
