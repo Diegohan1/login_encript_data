@@ -23,6 +23,7 @@ router.post('/register', postUsers);
 router.put('/user/:id_usuario', putUsers);
 router.delete('/user/:id_usuario', deleteUsers);
 */
+
 router.post('/login', loginUsers);
 /*
 router.get('/profile', authRequierd, profile);
